@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ghép Rank & Danh Hiệu 1080x1400 HD</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <!-- Dùng Be Vietnam Pro cho giao diện Web, còn Canvas sẽ dùng Arial chuẩn nét đều -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #131b2e;
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: #f8fafc;
+      min-height: 100vh;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      text-align: center;
+      color: var(--accent);
+      text-transform: uppercase;
+      padding-top: 8px;
+    }
+
+    .preview-box {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .canvas-wrapper {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1080 / 1400;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #000;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .control-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .upload-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1.5px dashed rgba(56, 189, 248, 0.4);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.6);
+      color: #38bdf8;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .upload-btn input {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0b0f19;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-download {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: #0b0f19;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 4px;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px;
+    }
+    .crop-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      max-height: 75vh;
+    }
+    .crop-container img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      padding-top: 16px;
+    }
+    .btn-modal {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-cancel { background: #334155; color: #fff; }
+    .btn-confirm { background: #22c55e; color: #fff; }
+
+    .result-text {
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header-title">TẠO ẢNH RANK CHUẨN HD</div>
+
+    <div class="preview-box">
+      <div class="canvas-wrapper">
+        <canvas id="mainCanvas" width="1080" height="1400"></canvas>
+      </div>
+    </div>
+
+    <div class="control-box">
+      <div>
+        <span class="label">1. Chọn ảnh nền (1080x1400)</span>
+        <div class="upload-btn">
+          <span>📁 Nhấn để tải ảnh lên & cắt</span>
+          <input type="file" id="imageInput" accept="image/*">
+        </div>
+      </div>
+
+      <div>
+        <span class="label">2. Huy hiệu Rank</span>
+        <select id="rankSelect">
+          <optgroup label="Bậc SSS+">
+            <option value="rank/sss+tt.png" selected>SSS+ Tối Thượng</option>
+            <option value="rank/sss+hh.png">SSS+ Hữu Hạn</option>
+          </optgroup>
+          <optgroup label="Bậc SSS">
+            <option value="rank/sssgt.png">SSS Giáp Thìn</option>
+            <option value="rank/ssshh.png">SSS Hữu Hạn</option>
+            <option value="rank/ssspre.png">SSS Premium</option>
+          </optgroup>
+          <optgroup label="Bậc SS / SS+">
+            <option value="rank/ss+binhngo.png">SS+ Bính Ngọ</option>
+            <option value="rank/ss+hh.png">SS+ Hữu Hạn</option>
+            <option value="rank/ss+pre.png">SS+ Premium</option>
+            <option value="rank/ssts.png">SS Tuyệt Sắc</option>
+            <option value="rank/ssvip.png">SS VIP</option>
+            <option value="rank/ssbinhngo.png">SS Bính Ngọ</option>
+            <option value="rank/ssgt.png">SS Giáp Thìn</option>
+            <option value="rank/sshh.png">SS Hữu Hạn</option>
+            <option value="rank/sspre.png">SS Premium</option>
+          </optgroup>
+          <optgroup label="Bậc S / S+">
+            <option value="rank/s+binhngo.png">S+ Bính Ngọ</option>
+            <option value="rank/s+gt.png">S+ Giáp Thìn</option>
+            <option value="rank/s+hh.png">S+ Hữu Hạn</option>
+            <option value="rank/s+pre.png">S+ Premium</option>
+            <option value="rank/shh.png">S Hữu Hạn</option>
+            <option value="rank/spre.png">S Premium</option>
+            <option value="rank/bacs.png">Bậc S</option>
+            <option value="rank/bacs+.png">Bậc S+</option>
+            <option value="rank/bacss.png">Bậc SS</option>
+          </optgroup>
+          <optgroup label="Bậc A / VIP">
+            <option value="rank/baca.png">Bậc A</option>
+            <option value="rank/avip.png">A VIP</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div>
+        <span class="label">3. Tên / Danh hiệu</span>
+        <input type="text" id="textInput" value="Hoàng tử tù" placeholder="Nhập tên hiển thị...">
+      </div>
+
+      <button class="btn-download" id="downloadBtn">⚡ TẢI ẢNH VỀ MÁY (HD)</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cropModal">
+    <div class="crop-container">
+      <img id="cropImage" src="">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" id="cancelCrop">Hủy</button>
+      <button class="btn-modal btn-confirm" id="confirmCrop">Cắt & Ghép</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="resultModal">
+    <div class="crop-container" style="flex-direction: column;">
+      <div class="result-text">
+        ✅ ĐÃ TẠO ẢNH THÀNH CÔNG!<br>
+        <span style="color: #cbd5e1; font-weight: 500;">(Nhấn giữ vào ảnh bên dưới -> Chọn <b>"Lưu ảnh"</b>)</span>
+      </div>
+      <img id="resultImage" src="" style="max-height: 65vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal btn-cancel" id="closeResult">Đóng</button>
+    </div>
+  </div>
+
+  <script>
+    const CANVAS_WIDTH = 1080;
+    const CANVAS_HEIGHT = 1400;
+
+    const RANK_TARGET_WIDTH = 580;   
+    const RANK_CENTER_X = 540;       
+    const RANK_BOTTOM_Y = 965;       
+    const TEXT_CENTER_X = 540;       
+    const TEXT_START_Y = 1025;       
+
+    const canvas = document.getElementById('mainCanvas');
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const imageInput = document.getElementById('imageInput');
+    const rankSelect = document.getElementById('rankSelect');
+    const textInput = document.getElementById('textInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    const cropModal = document.getElementById('cropModal');
+    const cropImage = document.getElementById('cropImage');
+    const confirmCropBtn = document.getElementById('confirmCrop');
+    const cancelCropBtn = document.getElementById('cancelCrop');
+
+    const resultModal = document.getElementById('resultModal');
+    const resultImage = document.getElementById('resultImage');
+    const closeResult = document.getElementById('closeResult');
+
+    let cropper = null;
+    let croppedBaseImage = new Image();
+    let currentRankImage = new Image();
+
+    imageInput.addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          cropImage.src = event.target.result;
+          cropModal.style.display = 'flex';
+          
+          if (cropper) cropper.destroy();
+          cropper = new Cropper(cropImage, {
+            aspectRatio: 1080 / 1400,
+            viewMode: 1,
+            autoCropArea: 1,
+            dragMode: 'move',
+            background: false
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    cancelCropBtn.addEventListener('click', () => {
+      cropModal.style.display = 'none';
+      imageInput.value = '';
+    });
+
+    confirmCropBtn.addEventListener('click', () => {
+      const croppedCanvas = cropper.getCroppedCanvas({
+        width: CANVAS_WIDTH,
+        height: CANVAS_HEIGHT,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+      
+      croppedBaseImage.src = croppedCanvas.toDataURL('image/png', 1.0);
+      croppedBaseImage.onload = () => {
+        cropModal.style.display = 'none';
+        renderCanvas();
+      };
+    });
+
+    function updateRankImage() {
+      currentRankImage.src = rankSelect.value;
+      currentRankImage.onload = renderCanvas;
+      currentRankImage.onerror = renderCanvas;
+    }
+
+    rankSelect.addEventListener('change', updateRankImage);
+    textInput.addEventListener('input', renderCanvas);
+
+    function renderCanvas() {
+      ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      ctx.fillStyle = '#131b2e';
+      ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+      if (croppedBaseImage.src && croppedBaseImage.complete) {
+        ctx.drawImage(croppedBaseImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+      } else {
+        ctx.fillStyle = '#475569';
+        ctx.font = '700 32px "Be Vietnam Pro"';
+        ctx.textAlign = 'center';
+        ctx.fillText('CHỌN ẢNH ĐỂ GHÉP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+      }
+
+      if (currentRankImage.src && currentRankImage.complete && currentRankImage.naturalWidth > 0) {
+        const imgW = currentRankImage.naturalWidth;
+        const imgH = currentRankImage.naturalHeight;
+        const renderW = RANK_TARGET_WIDTH;
+        const renderH = (imgH / imgW) * renderW;
+
+        const drawX = RANK_CENTER_X - (renderW / 2);
+        const drawY = RANK_BOTTOM_Y - renderH; 
+        ctx.drawImage(currentRankImage, drawX, drawY, renderW, renderH);
+      }
+
+      // CHỮ CHUẨN: Dùng Arial/Sans-serif nét đều, viền đen dày, size to
+      const text = textInput.value.trim() || 'Nhật Ký Tình Yêu';
+      
+      let fontSize = 115; // Tăng size lên 100px để to rõ
+      ctx.font = `600 ${fontSize}px Arial, sans-serif`; // Font đều không chân
+      
+      while (ctx.measureText(text).width > 900 && fontSize > 40) {
+        fontSize -= 2;
+        ctx.font = `600 ${fontSize}px Arial, sans-serif`;
+      }
+
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Viền đen dày (8px) bao đều quanh chữ
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 8;
+      ctx.lineJoin = 'round';
+      ctx.strokeText(text, TEXT_CENTER_X, TEXT_START_Y);
+
+      // Bóng mờ nhẹ để chữ nổi bật thêm
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 3;
+
+      // Màu vàng kem chuẩn theo hình mẫu
+      ctx.fillStyle = '#F1E6C5';
+      ctx.fillText(text, TEXT_CENTER_X, TEXT_START_Y);
+
+      // Reset shadow tránh ảnh hưởng lần vẽ sau
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      try {
+        const dataURL = canvas.toDataURL('image/png', 1.0);
+        const fileName = `Rank_${textInput.value.trim() || 'LienQuan'}_1080x1400.png`;
+
+        const link = document.createElement('a');
+        link.download = fileName;
+        link.href = dataURL;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        resultImage.src = dataURL;
+        resultModal.style.display = 'flex';
+      } catch (err) {
+        alert('Lỗi: Hãy mở trang web trên trình duyệt để tải được ảnh!');
+      }
+    });
+
+    closeResult.addEventListener('click', () => {
+      resultModal.style.display = 'none';
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.fonts.ready.then(updateRankImage);
+    });
+  </script>
+</body>
+</html>
