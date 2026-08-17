@@ -4,99 +4,315 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Ghép Rank & Danh Hiệu 1080x1400 HD - DusiTool</title>
+  
+  <!-- Cropper CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
-  <!-- Bộ Phông Chữ Đa Dạng Chuẩn Tiếng Việt -->
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Be+Vietnam+Pro:wght@600;700;800;900&family=Cinzel:wght@700;900&family=Montserrat:wght@700;800;900&family=Oswald:wght@700&family=Quicksand:wght@700&display=swap" rel="stylesheet">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Be+Vietnam+Pro:wght@500;600;700;800;900&family=Cinzel:wght@700;900&family=Montserrat:wght@700;800;900&family=Oswald:wght@700&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #060813;
-      --card: rgba(15, 23, 42, 0.85);
-      --card-inner: rgba(2, 6, 23, 0.6);
-      --border: rgba(56, 189, 248, 0.2);
-      --accent: #38bdf8;
-      --gold: #f59e0b;
-      --magenta: #d946ef;
-      --success: #10b981;
+      --bg-main: #040711;
+      --card-bg: rgba(13, 19, 36, 0.8);
+      --card-border: rgba(56, 189, 248, 0.25);
+      --accent-cyan: #38bdf8;
+      --accent-magenta: #d946ef;
+      --accent-gold: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Be Vietnam Pro', sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: var(--bg); color: #f8fafc; min-height: 100vh; padding: 14px; display: flex; justify-content: center; background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), transparent 40%); }
-    .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
-    
-    .header-title { font-size: 19px; font-weight: 900; text-align: center; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; display: flex; items-center; justify-content: center; gap: 8px; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
-    .preview-box { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 10px; display: flex; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    .canvas-wrapper { width: 100%; max-width: 320px; aspect-ratio: 1080 / 1400; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Be Vietnam Pro', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 16px 12px;
+      display: flex;
+      justify-content: center;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(217, 70, 239, 0.06), transparent 40%);
+      background-attachment: fixed;
+    }
+
+    .app-wrapper {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* HEADER */
+    .app-header {
+      text-align: center;
+      padding: 8px 0;
+      position: relative;
+    }
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #fff 20%, var(--accent-cyan) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* PREVIEW CANVAS */
+    .preview-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(56, 189, 248, 0.05);
+      position: relative;
+    }
+
+    .canvas-box {
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 1080 / 1400;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #02040a;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.8);
+    }
     canvas { width: 100%; height: 100%; display: block; }
 
-    .control-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 13px; backdrop-filter: blur(12px); }
-    .label { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-    
-    .upload-btn { width: 100%; padding: 12px; border: 1.5px dashed rgba(56, 189, 248, 0.4); border-radius: 10px; background: var(--card-inner); color: #38bdf8; font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; }
-    .upload-btn:hover { background: rgba(56, 189, 248, 0.1); }
-    .upload-btn input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    /* CONTROLS CARD */
+    .control-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
 
-    select, input[type="text"] { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); background: var(--card-inner); color: #fff; font-size: 14px; font-weight: 600; outline: none; transition: 0.2s; }
-    select:focus, input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.25); }
+    .field-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
 
-    /* Nút Khóa / Mở Khóa */
-    .lock-toggle-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; cursor: pointer; transition: 0.3s; user-select: none; }
-    .lock-toggle-bar.unlocked { border-color: var(--gold); background: rgba(245, 158, 11, 0.08); }
-    .lock-status-text { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    /* Upload Button Neon */
+    .btn-upload-glow {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px dashed rgba(56, 189, 248, 0.5);
+      border-radius: 12px;
+      background: rgba(14, 165, 233, 0.04);
+      color: var(--accent-cyan);
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-upload-glow:hover, .btn-upload-glow:active {
+      background: rgba(14, 165, 233, 0.12);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+      transform: scale(0.99);
+    }
+    .btn-upload-glow input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
 
-    /* Bảng thông số chi tiết khi Unlock */
-    .advanced-settings { display: none; flex-direction: column; gap: 12px; background: var(--card-inner); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 14px; animation: fadeIn 0.3s ease-out; }
-    .advanced-settings.show { display: flex; }
-    .slider-group { display: flex; flex-direction: column; gap: 4px; }
-    .slider-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #cbd5e1; }
-    input[type="range"] { width: 100%; accent-color: var(--accent); height: 5px; background: #334155; border-radius: 5px; cursor: pointer; }
+    /* Inputs & Selects */
+    select, input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(6, 11, 25, 0.85);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+      background: rgba(10, 16, 35, 0.95);
+    }
+
+    /* LOCK / UNLOCK TOGGLE BAR */
+    .lock-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+    .lock-bar:hover {
+      background: rgba(56, 189, 248, 0.05);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .lock-bar.unlocked {
+      border-color: rgba(245, 158, 11, 0.6);
+      background: rgba(245, 158, 11, 0.08);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+    }
+    .lock-title {
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lock-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-cyan);
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+    }
+    .lock-bar.unlocked .lock-badge {
+      background: var(--accent-gold);
+      color: #000;
+    }
+
+    /* ADVANCED DRAWER */
+    .advanced-drawer {
+      display: none;
+      flex-direction: column;
+      gap: 13px;
+      background: rgba(4, 8, 20, 0.7);
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      border-radius: 14px;
+      padding: 14px;
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .advanced-drawer.show { display: flex; }
+
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    .btn-download { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #0284c7); color: #020617; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 4px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
-    .btn-download:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .slider-row { display: flex; flex-direction: column; gap: 4px; }
+    .slider-info { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #cbd5e1; }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent-cyan);
+      height: 5px;
+      background: #1e293b;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 9999; display: none; flex-direction: column; justify-content: space-between; padding: 16px; }
-    .crop-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; max-height: 75vh; }
-    .crop-container img { max-width: 100%; max-height: 100%; }
-    .modal-actions { display: flex; gap: 10px; padding-top: 14px; }
-    .btn-modal { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
-    .btn-cancel { background: #334155; color: #fff; }
-    .btn-confirm { background: #10b981; color: #fff; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+    /* MAIN DOWNLOAD BUTTON */
+    .btn-main-action {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 50%, #0369a1 100%);
+      color: #020617;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 6px 25px rgba(56, 189, 248, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-main-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.6);
+      filter: brightness(1.1);
+    }
+    .btn-main-action:active { transform: scale(0.98); }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 9999;
+      display: none; flex-direction: column; justify-content: space-between; padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+    .crop-body { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; max-height: 75vh; }
+    .crop-body img { max-width: 100%; max-height: 100%; }
+    .modal-btn-row { display: flex; gap: 10px; padding-top: 14px; }
+    .btn-m { flex: 1; padding: 13px; border-radius: 12px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
+    .btn-m-cancel { background: #334155; color: #fff; }
+    .btn-m-save { background: #10b981; color: #fff; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
+
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
-    <div class="header-title">
-      <i class="ph-duotone ph-shield-star"></i> TẠO ẢNH RANK HD
+  <div class="app-wrapper">
+    <div class="app-header">
+      <h1><i class="ph-duotone ph-shield-chevron"></i> TẠO ẢNH RANK HD</h1>
     </div>
 
-    <!-- PREVIEW CANVAS -->
-    <div class="preview-box">
-      <div class="canvas-wrapper">
+    <!-- KHUNG PREVIEW -->
+    <div class="preview-card">
+      <div class="canvas-box">
         <canvas id="mainCanvas" width="1080" height="1400"></canvas>
       </div>
     </div>
 
-    <!-- CONTROLS -->
-    <div class="control-box">
+    <!-- KHUNG ĐIỀU KHIỂN -->
+    <div class="control-card">
       <div>
-        <span class="label">1. Ảnh Nền (1080x1400)</span>
-        <div class="upload-btn">
-          <span><i class="ph-bold ph-upload-simple"></i> Chọn ảnh & cắt tự động</span>
+        <span class="field-label"><i class="ph-bold ph-image"></i> 1. Ảnh Nền (1080x1400)</span>
+        <div class="btn-upload-glow">
+          <i class="ph-duotone ph-cloud-arrow-up text-lg"></i>
+          <span>Tải ảnh lên & Cắt chuẩn tỉ lệ</span>
           <input type="file" id="imageInput" accept="image/*">
         </div>
       </div>
 
       <div>
-        <span class="label">2. Huy Hiệu Rank & Danh Hiệu</span>
+        <span class="field-label"><i class="ph-bold ph-medal"></i> 2. Huy Hiệu Rank & Danh Hiệu</span>
         <select id="rankSelect">
-          <optgroup label="👑 CẤP ĐỘ GIA TỘC / VÔ THƯỢNG (MỚI)">
+          <optgroup label="👑 BẬC GIA TỘC / VÔ THƯỢNG (MỚI)">
             <option value="rank/vutru-Photoroom.png" selected>Vũ Trụ Chí Tôn (Vô Thượng Thiên Hà)</option>
             <option value="rank/ongconoi-Photoroom.png">Ông Cố Nội (Vô Thượng Tối Cao)</option>
             <option value="rank/chiton-Photoroom.png">Bậc Chí Tôn (Vô Thượng Tối Cao)</option>
@@ -138,40 +354,40 @@
       </div>
 
       <div>
-        <span class="label">3. Tên / Danh Hiệu Hiển Thị</span>
-        <input type="text" id="textInput" value="Hoàng tử tù" placeholder="Nhập tên hiển thị...">
+        <span class="field-label"><i class="ph-bold ph-text-t"></i> 3. Tên / Danh Hiệu Hiển Thị</span>
+        <input type="text" id="textInput" value="Hoàng tử tù" placeholder="Nhập tên nhân vật...">
       </div>
 
-      <!-- THANH KHÓA / MỞ KHÓA TỰ DO -->
-      <div class="lock-toggle-bar" id="lockToggleBtn">
-        <div class="lock-status-text" id="lockStatusText">
-          <i class="ph-fill ph-lock-simple text-sky-400"></i>
-          <span style="color:#cbd5e1;">Thông số chữ: <b>Mặc định chuẩn</b></span>
+      <!-- THANH KHÓA / MỞ KHÓA -->
+      <div class="lock-bar" id="lockBarBtn">
+        <div class="lock-title" id="lockTitle">
+          <i class="ph-fill ph-lock-key text-sky-400 text-base"></i>
+          <span>Thông số chữ: <b>Mặc định chuẩn</b></span>
         </div>
-        <span style="font-size: 11px; font-weight:800; color:var(--accent);" id="lockActionLabel">MỞ KHÓA</span>
+        <span class="lock-badge" id="lockBadge">MỞ KHÓA</span>
       </div>
 
-      <!-- BẢNG ĐIỀU KHIỂN TÙY CHỈNH KHI MỞ KHÓA -->
-      <div class="advanced-settings" id="advancedSettingsBox">
+      <!-- BẢNG TÙY BIẾN CHI TIẾT KHI MỞ KHÓA -->
+      <div class="advanced-drawer" id="advancedDrawer">
         <div class="grid-2">
           <div>
-            <span class="label">Phông Chữ</span>
+            <span class="field-label">Phông Chữ</span>
             <select id="fontSelect">
               <option value="Arial, sans-serif">Arial (Nét đều)</option>
               <option value="'Be Vietnam Pro', sans-serif">Be Vietnam Pro (Dày)</option>
               <option value="'Montserrat', sans-serif">Montserrat (Hiện đại)</option>
               <option value="'Cinzel', serif">Cinzel (Cổ điển)</option>
               <option value="'Oswald', sans-serif">Oswald (Thon cao)</option>
-              <option value="'Anton', sans-serif">Anton (Siêu to)</option>
+              <option value="'Anton', sans-serif">Anton (To bản)</option>
               <option value="'Quicksand', sans-serif">Quicksand (Bo tròn)</option>
             </select>
           </div>
           <div>
-            <span class="label">Màu Chữ</span>
+            <span class="field-label">Màu Chữ</span>
             <select id="textColorPreset">
               <option value="gold_gradient" selected>Vàng Kim 3D (Chuẩn)</option>
               <option value="#F1E6C5">Vàng Kem (#F1E6C5)</option>
-              <option value="#FFFFFF">Trắng Tuyết</option>
+              <option value="#FFFFFF">Trắng Sáng</option>
               <option value="#38bdf8">Xanh Cyan Neon</option>
               <option value="#d946ef">Hồng Magenta</option>
               <option value="#f43f5e">Đỏ Rực</option>
@@ -179,32 +395,32 @@
           </div>
         </div>
 
-        <div class="slider-group">
-          <div class="slider-header">
+        <div class="slider-row">
+          <div class="slider-info">
             <span>Cỡ chữ:</span>
             <span id="valFontSize" class="text-sky-400">120px</span>
           </div>
           <input type="range" id="sliderFontSize" min="50" max="180" value="120">
         </div>
 
-        <div class="slider-group">
-          <div class="slider-header">
+        <div class="slider-row">
+          <div class="slider-info">
             <span>Vị trí dọc (Trục Y):</span>
             <span id="valPosY" class="text-sky-400">1025px</span>
           </div>
           <input type="range" id="sliderPosY" min="700" max="1300" value="1025">
         </div>
 
-        <div class="slider-group">
-          <div class="slider-header">
+        <div class="slider-row">
+          <div class="slider-info">
             <span>Độ dày viền đen:</span>
             <span id="valStrokeWidth" class="text-sky-400">8px</span>
           </div>
           <input type="range" id="sliderStrokeWidth" min="0" max="25" value="8">
         </div>
 
-        <div class="slider-group">
-          <div class="slider-header">
+        <div class="slider-row">
+          <div class="slider-info">
             <span>Giãn cách ký tự:</span>
             <span id="valLetterSpacing" class="text-sky-400">0px</span>
           </div>
@@ -212,34 +428,34 @@
         </div>
       </div>
 
-      <button class="btn-download" id="downloadBtn">
-        <i class="ph-bold ph-lightning"></i> TẢI ẢNH VỀ MÁY (HD)
+      <button class="btn-main-action" id="downloadBtn">
+        <i class="ph-bold ph-download-simple text-lg"></i> TẢI ẢNH VỀ MÁY (HD)
       </button>
     </div>
   </div>
 
-  <!-- MODAL CẮT ẢNH CROPPER -->
-  <div class="modal-overlay" id="cropModal">
-    <div class="crop-container">
+  <!-- MODAL CẮT ẢNH -->
+  <div class="modal-backdrop" id="cropModal">
+    <div class="crop-body">
       <img id="cropImage" src="">
     </div>
-    <div class="modal-actions">
-      <button class="btn-modal btn-cancel" id="cancelCrop">Hủy</button>
-      <button class="btn-modal btn-confirm" id="confirmCrop">Cắt & Ghép</button>
+    <div class="modal-btn-row">
+      <button class="btn-m btn-m-cancel" id="cancelCrop">HỦY BỎ</button>
+      <button class="btn-m btn-m-save" id="confirmCrop">CẮT & ÁP DỤNG</button>
     </div>
   </div>
 
-  <!-- MODAL XUẤT KẾT QUẢ -->
-  <div class="modal-overlay" id="resultModal">
-    <div class="crop-container" style="flex-direction: column;">
-      <div style="color: #38bdf8; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px; line-height: 1.4;">
-        ✅ ĐÃ TẠO ẢNH THÀNH CÔNG!<br>
-        <span style="color: #cbd5e1; font-weight: 500;">(Nhấn giữ vào ảnh bên dưới -> Chọn <b>"Lưu ảnh"</b>)</span>
+  <!-- MODAL KẾT QUẢ CHO MOBILE -->
+  <div class="modal-backdrop" id="resultModal">
+    <div class="crop-body" style="flex-direction: column;">
+      <div style="color: #38bdf8; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 12px; line-height: 1.5;">
+        🎉 ĐÃ TẠO ẢNH THÀNH CÔNG!<br>
+        <span style="color: #cbd5e1; font-size: 12px; font-weight: 500;">(Nhấn giữ vào ảnh bên dưới -> Chọn <b>"Lưu hình ảnh"</b>)</span>
       </div>
-      <img id="resultImage" src="" style="max-height: 65vh; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);">
+      <img id="resultImage" src="" style="max-height: 65vh; border-radius: 12px; border: 1px solid rgba(56, 189, 248, 0.3);">
     </div>
-    <div class="modal-actions">
-      <button class="btn-modal btn-cancel" id="closeResult">Đóng</button>
+    <div class="modal-btn-row">
+      <button class="btn-m btn-m-cancel" id="closeResult">ĐÓNG</button>
     </div>
   </div>
 
@@ -247,15 +463,18 @@
     const CANVAS_WIDTH = 1080;
     const CANVAS_HEIGHT = 1400;
 
-    // Tọa độ và kích cỡ chuẩn mặc định
+    // KHUNG GIỚI HẠN CHUẨN ĐỂ HUY HIỆU KHÔNG BỊ PHỒNG TO
+    const RANK_BOUNDS = {
+      maxWidth: 580,
+      maxHeight: 250,      // Giới hạn chiều cao tuyệt đối để rank vuông tự động thu nhỏ cân đối
+      centerX: 540,
+      bottomY: 965
+    };
+
     const DEFAULTS = {
-      rankWidth: 580,
-      rankCenterX: 540,
-      rankBottomY: 965,
-      textCenterX: 540,
-      textStartY: 1025,
       fontSize: 120,
       fontFamily: 'Arial, sans-serif',
+      posY: 1025,
       colorPreset: 'gold_gradient',
       strokeWidth: 8,
       letterSpacing: 0
@@ -268,17 +487,17 @@
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Inputs
+    // Controls
     const imageInput = document.getElementById('imageInput');
     const rankSelect = document.getElementById('rankSelect');
     const textInput = document.getElementById('textInput');
     const downloadBtn = document.getElementById('downloadBtn');
 
-    // Advanced Inputs
-    const lockToggleBtn = document.getElementById('lockToggleBtn');
-    const lockStatusText = document.getElementById('lockStatusText');
-    const lockActionLabel = document.getElementById('lockActionLabel');
-    const advancedSettingsBox = document.getElementById('advancedSettingsBox');
+    // Advanced Lock Controls
+    const lockBarBtn = document.getElementById('lockBarBtn');
+    const lockTitle = document.getElementById('lockTitle');
+    const lockBadge = document.getElementById('lockBadge');
+    const advancedDrawer = document.getElementById('advancedDrawer');
 
     const fontSelect = document.getElementById('fontSelect');
     const textColorPreset = document.getElementById('textColorPreset');
@@ -305,26 +524,24 @@
     let croppedBaseImage = new Image();
     let currentRankImage = new Image();
 
-    // Khởi tạo toggle lock
-    lockToggleBtn.addEventListener('click', () => {
+    // Toggle Lock / Unlock
+    lockBarBtn.addEventListener('click', () => {
       isUnlocked = !isUnlocked;
       if (isUnlocked) {
-        lockToggleBtn.classList.add('unlocked');
-        lockStatusText.innerHTML = '<i class="ph-fill ph-lock-simple-open text-amber-400"></i><span style="color:#f59e0b;">Tự do chỉnh sửa phông & chữ</span>';
-        lockActionLabel.innerText = 'ĐÓNG KHÓA';
-        lockActionLabel.style.color = '#f59e0b';
-        advancedSettingsBox.classList.add('show');
+        lockBarBtn.classList.add('unlocked');
+        lockTitle.innerHTML = '<i class="ph-fill ph-lock-key-open text-amber-400 text-base"></i><span style="color:#f59e0b;">Tự do chỉnh thông số</span>';
+        lockBadge.innerText = 'ĐÓNG KHÓA';
+        advancedDrawer.classList.add('show');
       } else {
-        lockToggleBtn.classList.remove('unlocked');
-        lockStatusText.innerHTML = '<i class="ph-fill ph-lock-simple text-sky-400"></i><span style="color:#cbd5e1;">Thông số chữ: <b>Mặc định chuẩn</b></span>';
-        lockActionLabel.innerText = 'MỞ KHÓA';
-        lockActionLabel.style.color = 'var(--accent)';
-        advancedSettingsBox.classList.remove('show');
+        lockBarBtn.classList.remove('unlocked');
+        lockTitle.innerHTML = '<i class="ph-fill ph-lock-key text-sky-400 text-base"></i><span>Thông số chữ: <b>Mặc định chuẩn</b></span>';
+        lockBadge.innerText = 'MỞ KHÓA';
+        advancedDrawer.classList.remove('show');
       }
       renderCanvas();
     });
 
-    // Upload & Crop Handler
+    // Image Upload & Crop
     imageInput.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
@@ -372,23 +589,21 @@
       currentRankImage.onerror = renderCanvas;
     }
 
-    // Lắng nghe thay đổi Controls
     rankSelect.addEventListener('change', updateRankImage);
     textInput.addEventListener('input', renderCanvas);
 
-    // Advanced Controls Real-time Sync
+    // Advanced Event Listeners
     [fontSelect, textColorPreset].forEach(el => el.addEventListener('change', renderCanvas));
-
     sliderFontSize.addEventListener('input', (e) => { valFontSize.innerText = e.target.value + 'px'; renderCanvas(); });
     sliderPosY.addEventListener('input', (e) => { valPosY.innerText = e.target.value + 'px'; renderCanvas(); });
     sliderStrokeWidth.addEventListener('input', (e) => { valStrokeWidth.innerText = e.target.value + 'px'; renderCanvas(); });
     sliderLetterSpacing.addEventListener('input', (e) => { valLetterSpacing.innerText = e.target.value + 'px'; renderCanvas(); });
 
-    // HÀM RENDER CANVAS NÂNG CAO
+    // THUẬT TOÁN RENDER CANVAS CÂN ĐỐI KÍCH THƯỚC RANK
     function renderCanvas() {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      // 1. Vẽ Background
+      // 1. Background
       ctx.fillStyle = '#060813';
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -401,24 +616,28 @@
         ctx.fillText('CHỌN ẢNH ĐỂ BẮT ĐẦU GHÉP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       }
 
-      // 2. Vẽ Huy hiệu Rank
+      // 2. Thuật toán cân đối kích thước Huy hiệu (Tự fit cả rank vuông lẫn rank chữ nhật)
       if (currentRankImage.src && currentRankImage.complete && currentRankImage.naturalWidth > 0) {
         const imgW = currentRankImage.naturalWidth;
         const imgH = currentRankImage.naturalHeight;
-        const renderW = DEFAULTS.rankWidth;
-        const renderH = (imgH / imgW) * renderW;
 
-        const drawX = DEFAULTS.rankCenterX - (renderW / 2);
-        const drawY = DEFAULTS.rankBottomY - renderH; 
+        // Tính tỉ lệ thu nhỏ theo cả Max Width và Max Height
+        const scale = Math.min(RANK_BOUNDS.maxWidth / imgW, RANK_BOUNDS.maxHeight / imgH);
+        const renderW = imgW * scale;
+        const renderH = imgH * scale;
+
+        const drawX = RANK_BOUNDS.centerX - (renderW / 2);
+        const drawY = RANK_BOUNDS.bottomY - renderH;
+        
         ctx.drawImage(currentRankImage, drawX, drawY, renderW, renderH);
       }
 
-      // 3. Tính toán thông số Text
+      // 3. Render Text
       const text = textInput.value.trim() || 'Nhật Ký Tình Yêu';
       
       let fontSize = isUnlocked ? parseInt(sliderFontSize.value) : DEFAULTS.fontSize;
-      const posY = isUnlocked ? parseInt(sliderPosY.value) : DEFAULTS.textStartY;
-      const posX = DEFAULTS.textCenterX;
+      const posY = isUnlocked ? parseInt(sliderPosY.value) : DEFAULTS.posY;
+      const posX = RANK_BOUNDS.centerX;
       const strokeW = isUnlocked ? parseInt(sliderStrokeWidth.value) : DEFAULTS.strokeWidth;
       const fontFamily = isUnlocked ? fontSelect.value : DEFAULTS.fontFamily;
       const colorMode = isUnlocked ? textColorPreset.value : DEFAULTS.colorPreset;
@@ -431,7 +650,7 @@
 
       ctx.font = `700 ${fontSize}px ${fontFamily}`;
 
-      // Tự động thu nhỏ nếu chữ vượt quá khung
+      // Thu nhỏ nếu chữ dài quá bề ngang
       while (ctx.measureText(text).width > 920 && fontSize > 35) {
         fontSize -= 2;
         ctx.font = `700 ${fontSize}px ${fontFamily}`;
@@ -440,7 +659,7 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // 4. Vẽ Đổ bóng & Viền ngoài
+      // Vẽ viền đen sắc nét
       if (strokeW > 0) {
         ctx.strokeStyle = '#000000';
         ctx.lineWidth = strokeW;
@@ -449,10 +668,9 @@
         ctx.strokeText(text, posX, posY);
       }
 
-      // 5. Đổ màu ruột chữ (Hỗ trợ 3D Gradient)
+      // Đổ màu kim loại 3D Gradient
       if (colorMode === 'gold_gradient') {
-        const textH = fontSize;
-        const grad = ctx.createLinearGradient(posX, posY - textH / 2, posX, posY + textH / 2);
+        const grad = ctx.createLinearGradient(posX, posY - fontSize / 2, posX, posY + fontSize / 2);
         grad.addColorStop(0, '#FFFFFF');
         grad.addColorStop(0.25, '#FFF6D6');
         grad.addColorStop(0.6, '#F1E6C5');
@@ -462,7 +680,7 @@
         ctx.fillStyle = colorMode;
       }
 
-      // Đổ bóng nổi
+      // Đổ bóng nổi khối
       ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
       ctx.shadowBlur = 8;
       ctx.shadowOffsetY = 4;
@@ -471,7 +689,7 @@
       ctx.restore();
     }
 
-    // Tải ảnh về máy
+    // Tải ảnh
     downloadBtn.addEventListener('click', () => {
       try {
         const dataURL = canvas.toDataURL('image/png', 1.0);
@@ -487,7 +705,7 @@
         resultImage.src = dataURL;
         resultModal.style.display = 'flex';
       } catch (err) {
-        alert('Vui lòng mở web trên trình duyệt Chrome/Safari để tải ảnh HD!');
+        alert('Mở web trên Chrome hoặc Safari để lưu ảnh chuẩn HD nhé!');
       }
     });
 
