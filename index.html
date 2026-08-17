@@ -3,226 +3,107 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Ghép Rank & Danh Hiệu 1080x1400 HD</title>
+  <title>Ghép Rank & Danh Hiệu 1080x1400 HD - DusiTool</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-  <!-- Dùng Be Vietnam Pro cho giao diện Web, còn Canvas sẽ dùng Arial chuẩn nét đều -->
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  
+  <!-- Bộ Phông Chữ Đa Dạng Chuẩn Tiếng Việt -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Be+Vietnam+Pro:wght@600;700;800;900&family=Cinzel:wght@700;900&family=Montserrat:wght@700;800;900&family=Oswald:wght@700&family=Quicksand:wght@700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #0b0f19;
-      --card: #131b2e;
-      --border: rgba(255, 255, 255, 0.08);
+      --bg: #060813;
+      --card: rgba(15, 23, 42, 0.85);
+      --card-inner: rgba(2, 6, 23, 0.6);
+      --border: rgba(56, 189, 248, 0.2);
       --accent: #38bdf8;
+      --gold: #f59e0b;
+      --magenta: #d946ef;
+      --success: #10b981;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Be Vietnam Pro', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Be Vietnam Pro', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: var(--bg); color: #f8fafc; min-height: 100vh; padding: 14px; display: flex; justify-content: center; background-image: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08), transparent 40%); }
+    .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 14px; }
+    
+    .header-title { font-size: 19px; font-weight: 900; text-align: center; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; display: flex; items-center; justify-content: center; gap: 8px; text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+    .preview-box { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 10px; display: flex; justify-content: center; backdrop-filter: blur(12px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .canvas-wrapper { width: 100%; max-width: 320px; aspect-ratio: 1080 / 1400; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+    canvas { width: 100%; height: 100%; display: block; }
 
-    body {
-      background: var(--bg);
-      color: #f8fafc;
-      min-height: 100vh;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-    }
+    .control-box { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 13px; backdrop-filter: blur(12px); }
+    .label { font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+    
+    .upload-btn { width: 100%; padding: 12px; border: 1.5px dashed rgba(56, 189, 248, 0.4); border-radius: 10px; background: var(--card-inner); color: #38bdf8; font-weight: 700; font-size: 13px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; }
+    .upload-btn:hover { background: rgba(56, 189, 248, 0.1); }
+    .upload-btn input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 
-    .app-container {
-      width: 100%;
-      max-width: 480px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    select, input[type="text"] { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); background: var(--card-inner); color: #fff; font-size: 14px; font-weight: 600; outline: none; transition: 0.2s; }
+    select:focus, input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(56, 189, 248, 0.25); }
 
-    .header-title {
-      font-size: 20px;
-      font-weight: 800;
-      text-align: center;
-      color: var(--accent);
-      text-transform: uppercase;
-      padding-top: 8px;
-    }
+    /* Nút Khóa / Mở Khóa */
+    .lock-toggle-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; cursor: pointer; transition: 0.3s; user-select: none; }
+    .lock-toggle-bar.unlocked { border-color: var(--gold); background: rgba(245, 158, 11, 0.08); }
+    .lock-status-text { font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 
-    .preview-box {
-      width: 100%;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px;
-      display: flex;
-      justify-content: center;
-    }
+    /* Bảng thông số chi tiết khi Unlock */
+    .advanced-settings { display: none; flex-direction: column; gap: 12px; background: var(--card-inner); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 14px; animation: fadeIn 0.3s ease-out; }
+    .advanced-settings.show { display: flex; }
+    .slider-group { display: flex; flex-direction: column; gap: 4px; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: #cbd5e1; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); height: 5px; background: #334155; border-radius: 5px; cursor: pointer; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-    .canvas-wrapper {
-      width: 100%;
-      max-width: 320px;
-      aspect-ratio: 1080 / 1400;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: #000;
-    }
+    .btn-download { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent), #0284c7); color: #020617; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 4px; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.35); display: flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+    .btn-download:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .control-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .label {
-      font-size: 12px;
-      font-weight: 700;
-      color: #94a3b8;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .upload-btn {
-      width: 100%;
-      padding: 14px;
-      border: 1.5px dashed rgba(56, 189, 248, 0.4);
-      border-radius: 12px;
-      background: rgba(15, 23, 42, 0.6);
-      color: #38bdf8;
-      font-weight: 700;
-      font-size: 14px;
-      text-align: center;
-      cursor: pointer;
-      position: relative;
-    }
-    .upload-btn input {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    select, input[type="text"] {
-      width: 100%;
-      padding: 13px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #0b0f19;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      outline: none;
-    }
-    select:focus, input[type="text"]:focus {
-      border-color: var(--accent);
-    }
-
-    .btn-download {
-      width: 100%;
-      padding: 16px;
-      background: var(--accent);
-      color: #0b0f19;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 800;
-      text-transform: uppercase;
-      cursor: pointer;
-      margin-top: 4px;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0, 0, 0, 0.92);
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 20px 16px;
-    }
-    .crop-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      max-height: 75vh;
-    }
-    .crop-container img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 12px;
-      padding-top: 16px;
-    }
-    .btn-modal {
-      flex: 1;
-      padding: 14px;
-      border-radius: 12px;
-      border: none;
-      font-weight: 800;
-      font-size: 15px;
-      cursor: pointer;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 9999; display: none; flex-direction: column; justify-content: space-between; padding: 16px; }
+    .crop-container { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; max-height: 75vh; }
+    .crop-container img { max-width: 100%; max-height: 100%; }
+    .modal-actions { display: flex; gap: 10px; padding-top: 14px; }
+    .btn-modal { flex: 1; padding: 13px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; }
     .btn-cancel { background: #334155; color: #fff; }
-    .btn-confirm { background: #22c55e; color: #fff; }
-
-    .result-text {
-      color: #38bdf8;
-      font-size: 13px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 10px;
-      line-height: 1.4;
-    }
+    .btn-confirm { background: #10b981; color: #fff; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
   <div class="app-container">
-    <div class="header-title">TẠO ẢNH RANK CHUẨN HD</div>
+    <div class="header-title">
+      <i class="ph-duotone ph-shield-star"></i> TẠO ẢNH RANK HD
+    </div>
 
+    <!-- PREVIEW CANVAS -->
     <div class="preview-box">
       <div class="canvas-wrapper">
         <canvas id="mainCanvas" width="1080" height="1400"></canvas>
       </div>
     </div>
 
+    <!-- CONTROLS -->
     <div class="control-box">
       <div>
-        <span class="label">1. Chọn ảnh nền (1080x1400)</span>
+        <span class="label">1. Ảnh Nền (1080x1400)</span>
         <div class="upload-btn">
-          <span>📁 Nhấn để tải ảnh lên & cắt</span>
+          <span><i class="ph-bold ph-upload-simple"></i> Chọn ảnh & cắt tự động</span>
           <input type="file" id="imageInput" accept="image/*">
         </div>
       </div>
 
       <div>
-        <span class="label">2. Huy hiệu Rank</span>
+        <span class="label">2. Huy Hiệu Rank & Danh Hiệu</span>
         <select id="rankSelect">
-          <optgroup label="Bậc SSS+">
-            <option value="rank/sss+tt.png" selected>SSS+ Tối Thượng</option>
-            <option value="rank/sss+hh.png">SSS+ Hữu Hạn</option>
+          <optgroup label="👑 CẤP ĐỘ GIA TỘC / VÔ THƯỢNG (MỚI)">
+            <option value="rank/vutru-Photoroom.png" selected>Vũ Trụ Chí Tôn (Vô Thượng Thiên Hà)</option>
+            <option value="rank/ongconoi-Photoroom.png">Ông Cố Nội (Vô Thượng Tối Cao)</option>
+            <option value="rank/chiton-Photoroom.png">Bậc Chí Tôn (Vô Thượng Tối Cao)</option>
           </optgroup>
-          <optgroup label="Bậc SSS">
+          <optgroup label="Bậc SSS+ / SSS">
+            <option value="rank/sss+tt.png">SSS+ Tối Thượng</option>
+            <option value="rank/sss+hh.png">SSS+ Hữu Hạn</option>
             <option value="rank/sssgt.png">SSS Giáp Thìn</option>
             <option value="rank/ssshh.png">SSS Hữu Hạn</option>
             <option value="rank/ssspre.png">SSS Premium</option>
@@ -257,14 +138,87 @@
       </div>
 
       <div>
-        <span class="label">3. Tên / Danh hiệu</span>
+        <span class="label">3. Tên / Danh Hiệu Hiển Thị</span>
         <input type="text" id="textInput" value="Hoàng tử tù" placeholder="Nhập tên hiển thị...">
       </div>
 
-      <button class="btn-download" id="downloadBtn">⚡ TẢI ẢNH VỀ MÁY (HD)</button>
+      <!-- THANH KHÓA / MỞ KHÓA TỰ DO -->
+      <div class="lock-toggle-bar" id="lockToggleBtn">
+        <div class="lock-status-text" id="lockStatusText">
+          <i class="ph-fill ph-lock-simple text-sky-400"></i>
+          <span style="color:#cbd5e1;">Thông số chữ: <b>Mặc định chuẩn</b></span>
+        </div>
+        <span style="font-size: 11px; font-weight:800; color:var(--accent);" id="lockActionLabel">MỞ KHÓA</span>
+      </div>
+
+      <!-- BẢNG ĐIỀU KHIỂN TÙY CHỈNH KHI MỞ KHÓA -->
+      <div class="advanced-settings" id="advancedSettingsBox">
+        <div class="grid-2">
+          <div>
+            <span class="label">Phông Chữ</span>
+            <select id="fontSelect">
+              <option value="Arial, sans-serif">Arial (Nét đều)</option>
+              <option value="'Be Vietnam Pro', sans-serif">Be Vietnam Pro (Dày)</option>
+              <option value="'Montserrat', sans-serif">Montserrat (Hiện đại)</option>
+              <option value="'Cinzel', serif">Cinzel (Cổ điển)</option>
+              <option value="'Oswald', sans-serif">Oswald (Thon cao)</option>
+              <option value="'Anton', sans-serif">Anton (Siêu to)</option>
+              <option value="'Quicksand', sans-serif">Quicksand (Bo tròn)</option>
+            </select>
+          </div>
+          <div>
+            <span class="label">Màu Chữ</span>
+            <select id="textColorPreset">
+              <option value="gold_gradient" selected>Vàng Kim 3D (Chuẩn)</option>
+              <option value="#F1E6C5">Vàng Kem (#F1E6C5)</option>
+              <option value="#FFFFFF">Trắng Tuyết</option>
+              <option value="#38bdf8">Xanh Cyan Neon</option>
+              <option value="#d946ef">Hồng Magenta</option>
+              <option value="#f43f5e">Đỏ Rực</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Cỡ chữ:</span>
+            <span id="valFontSize" class="text-sky-400">120px</span>
+          </div>
+          <input type="range" id="sliderFontSize" min="50" max="180" value="120">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Vị trí dọc (Trục Y):</span>
+            <span id="valPosY" class="text-sky-400">1025px</span>
+          </div>
+          <input type="range" id="sliderPosY" min="700" max="1300" value="1025">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Độ dày viền đen:</span>
+            <span id="valStrokeWidth" class="text-sky-400">8px</span>
+          </div>
+          <input type="range" id="sliderStrokeWidth" min="0" max="25" value="8">
+        </div>
+
+        <div class="slider-group">
+          <div class="slider-header">
+            <span>Giãn cách ký tự:</span>
+            <span id="valLetterSpacing" class="text-sky-400">0px</span>
+          </div>
+          <input type="range" id="sliderLetterSpacing" min="-5" max="30" value="0">
+        </div>
+      </div>
+
+      <button class="btn-download" id="downloadBtn">
+        <i class="ph-bold ph-lightning"></i> TẢI ẢNH VỀ MÁY (HD)
+      </button>
     </div>
   </div>
 
+  <!-- MODAL CẮT ẢNH CROPPER -->
   <div class="modal-overlay" id="cropModal">
     <div class="crop-container">
       <img id="cropImage" src="">
@@ -275,9 +229,10 @@
     </div>
   </div>
 
+  <!-- MODAL XUẤT KẾT QUẢ -->
   <div class="modal-overlay" id="resultModal">
     <div class="crop-container" style="flex-direction: column;">
-      <div class="result-text">
+      <div style="color: #38bdf8; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px; line-height: 1.4;">
         ✅ ĐÃ TẠO ẢNH THÀNH CÔNG!<br>
         <span style="color: #cbd5e1; font-weight: 500;">(Nhấn giữ vào ảnh bên dưới -> Chọn <b>"Lưu ảnh"</b>)</span>
       </div>
@@ -292,27 +247,56 @@
     const CANVAS_WIDTH = 1080;
     const CANVAS_HEIGHT = 1400;
 
-    const RANK_TARGET_WIDTH = 580;   
-    const RANK_CENTER_X = 540;       
-    const RANK_BOTTOM_Y = 965;       
-    const TEXT_CENTER_X = 540;       
-    const TEXT_START_Y = 1025;       
+    // Tọa độ và kích cỡ chuẩn mặc định
+    const DEFAULTS = {
+      rankWidth: 580,
+      rankCenterX: 540,
+      rankBottomY: 965,
+      textCenterX: 540,
+      textStartY: 1025,
+      fontSize: 120,
+      fontFamily: 'Arial, sans-serif',
+      colorPreset: 'gold_gradient',
+      strokeWidth: 8,
+      letterSpacing: 0
+    };
+
+    let isUnlocked = false;
 
     const canvas = document.getElementById('mainCanvas');
     const ctx = canvas.getContext('2d', { alpha: false });
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
+    // Inputs
     const imageInput = document.getElementById('imageInput');
     const rankSelect = document.getElementById('rankSelect');
     const textInput = document.getElementById('textInput');
     const downloadBtn = document.getElementById('downloadBtn');
 
+    // Advanced Inputs
+    const lockToggleBtn = document.getElementById('lockToggleBtn');
+    const lockStatusText = document.getElementById('lockStatusText');
+    const lockActionLabel = document.getElementById('lockActionLabel');
+    const advancedSettingsBox = document.getElementById('advancedSettingsBox');
+
+    const fontSelect = document.getElementById('fontSelect');
+    const textColorPreset = document.getElementById('textColorPreset');
+    const sliderFontSize = document.getElementById('sliderFontSize');
+    const sliderPosY = document.getElementById('sliderPosY');
+    const sliderStrokeWidth = document.getElementById('sliderStrokeWidth');
+    const sliderLetterSpacing = document.getElementById('sliderLetterSpacing');
+
+    const valFontSize = document.getElementById('valFontSize');
+    const valPosY = document.getElementById('valPosY');
+    const valStrokeWidth = document.getElementById('valStrokeWidth');
+    const valLetterSpacing = document.getElementById('valLetterSpacing');
+
+    // Modals
     const cropModal = document.getElementById('cropModal');
     const cropImage = document.getElementById('cropImage');
     const confirmCropBtn = document.getElementById('confirmCrop');
     const cancelCropBtn = document.getElementById('cancelCrop');
-
     const resultModal = document.getElementById('resultModal');
     const resultImage = document.getElementById('resultImage');
     const closeResult = document.getElementById('closeResult');
@@ -321,6 +305,26 @@
     let croppedBaseImage = new Image();
     let currentRankImage = new Image();
 
+    // Khởi tạo toggle lock
+    lockToggleBtn.addEventListener('click', () => {
+      isUnlocked = !isUnlocked;
+      if (isUnlocked) {
+        lockToggleBtn.classList.add('unlocked');
+        lockStatusText.innerHTML = '<i class="ph-fill ph-lock-simple-open text-amber-400"></i><span style="color:#f59e0b;">Tự do chỉnh sửa phông & chữ</span>';
+        lockActionLabel.innerText = 'ĐÓNG KHÓA';
+        lockActionLabel.style.color = '#f59e0b';
+        advancedSettingsBox.classList.add('show');
+      } else {
+        lockToggleBtn.classList.remove('unlocked');
+        lockStatusText.innerHTML = '<i class="ph-fill ph-lock-simple text-sky-400"></i><span style="color:#cbd5e1;">Thông số chữ: <b>Mặc định chuẩn</b></span>';
+        lockActionLabel.innerText = 'MỞ KHÓA';
+        lockActionLabel.style.color = 'var(--accent)';
+        advancedSettingsBox.classList.remove('show');
+      }
+      renderCanvas();
+    });
+
+    // Upload & Crop Handler
     imageInput.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (file) {
@@ -368,70 +372,106 @@
       currentRankImage.onerror = renderCanvas;
     }
 
+    // Lắng nghe thay đổi Controls
     rankSelect.addEventListener('change', updateRankImage);
     textInput.addEventListener('input', renderCanvas);
 
+    // Advanced Controls Real-time Sync
+    [fontSelect, textColorPreset].forEach(el => el.addEventListener('change', renderCanvas));
+
+    sliderFontSize.addEventListener('input', (e) => { valFontSize.innerText = e.target.value + 'px'; renderCanvas(); });
+    sliderPosY.addEventListener('input', (e) => { valPosY.innerText = e.target.value + 'px'; renderCanvas(); });
+    sliderStrokeWidth.addEventListener('input', (e) => { valStrokeWidth.innerText = e.target.value + 'px'; renderCanvas(); });
+    sliderLetterSpacing.addEventListener('input', (e) => { valLetterSpacing.innerText = e.target.value + 'px'; renderCanvas(); });
+
+    // HÀM RENDER CANVAS NÂNG CAO
     function renderCanvas() {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-      ctx.fillStyle = '#131b2e';
+      // 1. Vẽ Background
+      ctx.fillStyle = '#060813';
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
       if (croppedBaseImage.src && croppedBaseImage.complete) {
         ctx.drawImage(croppedBaseImage, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       } else {
-        ctx.fillStyle = '#475569';
+        ctx.fillStyle = '#334155';
         ctx.font = '700 32px "Be Vietnam Pro"';
         ctx.textAlign = 'center';
-        ctx.fillText('CHỌN ẢNH ĐỂ GHÉP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+        ctx.fillText('CHỌN ẢNH ĐỂ BẮT ĐẦU GHÉP', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
       }
 
+      // 2. Vẽ Huy hiệu Rank
       if (currentRankImage.src && currentRankImage.complete && currentRankImage.naturalWidth > 0) {
         const imgW = currentRankImage.naturalWidth;
         const imgH = currentRankImage.naturalHeight;
-        const renderW = RANK_TARGET_WIDTH;
+        const renderW = DEFAULTS.rankWidth;
         const renderH = (imgH / imgW) * renderW;
 
-        const drawX = RANK_CENTER_X - (renderW / 2);
-        const drawY = RANK_BOTTOM_Y - renderH; 
+        const drawX = DEFAULTS.rankCenterX - (renderW / 2);
+        const drawY = DEFAULTS.rankBottomY - renderH; 
         ctx.drawImage(currentRankImage, drawX, drawY, renderW, renderH);
       }
 
-      // CHỮ CHUẨN: Dùng Arial/Sans-serif nét đều, viền đen dày, size to
+      // 3. Tính toán thông số Text
       const text = textInput.value.trim() || 'Nhật Ký Tình Yêu';
       
-      let fontSize = 120; // Tăng size lên 100px để to rõ
-      ctx.font = `600 ${fontSize}px Arial, sans-serif`; // Font đều không chân
-      
-      while (ctx.measureText(text).width > 900 && fontSize > 40) {
+      let fontSize = isUnlocked ? parseInt(sliderFontSize.value) : DEFAULTS.fontSize;
+      const posY = isUnlocked ? parseInt(sliderPosY.value) : DEFAULTS.textStartY;
+      const posX = DEFAULTS.textCenterX;
+      const strokeW = isUnlocked ? parseInt(sliderStrokeWidth.value) : DEFAULTS.strokeWidth;
+      const fontFamily = isUnlocked ? fontSelect.value : DEFAULTS.fontFamily;
+      const colorMode = isUnlocked ? textColorPreset.value : DEFAULTS.colorPreset;
+      const spacing = isUnlocked ? parseInt(sliderLetterSpacing.value) : DEFAULTS.letterSpacing;
+
+      ctx.save();
+      if ('letterSpacing' in ctx) {
+        ctx.letterSpacing = `${spacing}px`;
+      }
+
+      ctx.font = `700 ${fontSize}px ${fontFamily}`;
+
+      // Tự động thu nhỏ nếu chữ vượt quá khung
+      while (ctx.measureText(text).width > 920 && fontSize > 35) {
         fontSize -= 2;
-        ctx.font = `600 ${fontSize}px Arial, sans-serif`;
+        ctx.font = `700 ${fontSize}px ${fontFamily}`;
       }
 
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      // Viền đen dày (8px) bao đều quanh chữ
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 8;
-      ctx.lineJoin = 'round';
-      ctx.strokeText(text, TEXT_CENTER_X, TEXT_START_Y);
+      // 4. Vẽ Đổ bóng & Viền ngoài
+      if (strokeW > 0) {
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = strokeW;
+        ctx.lineJoin = 'round';
+        ctx.miterLimit = 2;
+        ctx.strokeText(text, posX, posY);
+      }
 
-      // Bóng mờ nhẹ để chữ nổi bật thêm
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      // 5. Đổ màu ruột chữ (Hỗ trợ 3D Gradient)
+      if (colorMode === 'gold_gradient') {
+        const textH = fontSize;
+        const grad = ctx.createLinearGradient(posX, posY - textH / 2, posX, posY + textH / 2);
+        grad.addColorStop(0, '#FFFFFF');
+        grad.addColorStop(0.25, '#FFF6D6');
+        grad.addColorStop(0.6, '#F1E6C5');
+        grad.addColorStop(1, '#CDB885');
+        ctx.fillStyle = grad;
+      } else {
+        ctx.fillStyle = colorMode;
+      }
+
+      // Đổ bóng nổi
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
       ctx.shadowBlur = 8;
-      ctx.shadowOffsetY = 3;
+      ctx.shadowOffsetY = 4;
 
-      // Màu vàng kem chuẩn theo hình mẫu
-      ctx.fillStyle = '#F1E6C5';
-      ctx.fillText(text, TEXT_CENTER_X, TEXT_START_Y);
-
-      // Reset shadow tránh ảnh hưởng lần vẽ sau
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetY = 0;
+      ctx.fillText(text, posX, posY);
+      ctx.restore();
     }
 
+    // Tải ảnh về máy
     downloadBtn.addEventListener('click', () => {
       try {
         const dataURL = canvas.toDataURL('image/png', 1.0);
@@ -447,13 +487,11 @@
         resultImage.src = dataURL;
         resultModal.style.display = 'flex';
       } catch (err) {
-        alert('Lỗi: Hãy mở trang web trên trình duyệt để tải được ảnh!');
+        alert('Vui lòng mở web trên trình duyệt Chrome/Safari để tải ảnh HD!');
       }
     });
 
-    closeResult.addEventListener('click', () => {
-      resultModal.style.display = 'none';
-    });
+    closeResult.addEventListener('click', () => { resultModal.style.display = 'none'; });
 
     window.addEventListener('DOMContentLoaded', () => {
       document.fonts.ready.then(updateRankImage);
